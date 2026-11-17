@@ -1,0 +1,61 @@
+[project]
+name = "flype"
+version = "0.1.0"
+description = "Behaviour detection in Drosophila video with YOLO11"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ultralytics>=8.3.20",
+]
+
+[project.optional-dependencies]
+# Choose exactly one PyTorch runtime:
+#   uv sync --extra cuda   # Windows/Linux with an NVIDIA GPU
+#   uv sync --extra metal  # macOS on Apple Silicon (MPS)
+#   uv sync --extra cpu    # CPU only
+cpu = ["torch>=2.0.0", "torchvision>=0.15.0"]
+cuda = ["torch>=2.0.0", "torchvision>=0.15.0"]
+metal = ["torch>=2.0.0", "torchvision>=0.15.0"]
+
+[project.scripts]
+flype-train = "flype.train:main"
+
+[project.urls]
+Homepage = "https://mfkeles.github.io/FlyPE"
+Repository = "https://github.com/mfkeles/FlyPE"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flype"]
+
+[tool.uv]
+conflicts = [
+    [{ extra = "cpu" }, { extra = "cuda" }],
+    [{ extra = "cpu" }, { extra = "metal" }],
+    [{ extra = "cuda" }, { extra = "metal" }],
+]
+
+# Route torch to the matching wheel index. macOS uses the default PyPI wheel,
+# which includes MPS support.
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu128", extra = "cuda" },
+]
+torchvision = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu128", extra = "cuda" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FlyPE</title>
+<meta name="description" content="Behaviour detection in Drosophila video with a YOLO11 object detector.">
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --text: #1d2126;
+    --muted: #5d6670;
+    --border: #e3dfd6;
+    --accent: #1f7a63;
+    --code-bg: #f1eee7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --surface: #1b1f23;
+      --text: #e7e9eb;
+      --muted: #9aa4ae;
+      --border: #2c3238;
+      --accent: #63c3a7;
+      --code-bg: #20252a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 72px 20px 96px; }
+  header { margin-bottom: 56px; }
+  h1 { font-size: 3rem; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 16px; }
+  .lede { font-size: 1.25rem; color: var(--muted); margin: 0 0 28px; max-width: 34em; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .links a {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .links a:hover { border-color: var(--accent); color: var(--accent); }
+  .links a.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .links a.primary:hover { opacity: 0.88; color: var(--bg); }
+  section { margin-top: 52px; }
+  h2 {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+  p { margin: 0 0 16px; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; }
+  code { background: var(--code-bg); padding: 2px 5px; border-radius: 4px; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 0 0 16px;
+    overflow-x: auto;
+    line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; width: 38%; }
+  ul.classes { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 16px; }
+  ul.classes li {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 4px 13px;
+    font-size: 0.9rem;
+  }
+  ul.classes span { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
+  footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+  @media (max-width: 520px) {
+    main { padding: 44px 16px 72px; }
+    h1 { font-size: 2.3rem; }
+    .lede { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>FlyPE</h1>
+    <p class="lede">Behaviour detection in <em>Drosophila</em> video with a YOLO11 object detector.</p>
+    <nav class="links">
+      <a class="primary" href="https://github.com/mfkeles/FlyPE">Code on GitHub</a>
+    </nav>
+  </header>
+
+  <section>
+    <h2>Overview</h2>
+    <p>FlyPE fine-tunes a YOLO11-l detector to localise a fly and classify its behaviour in each video frame. The detector is trained on motion-heatmap frames, in which recent movement is colour-coded on top of the grey-scale image, so that behaviours that differ only in small movements of the proboscis or legs remain separable.</p>
+    <ul class="classes">
+      <li><span>0</span>ProbPumping</li>
+      <li><span>1</span>Moving</li>
+      <li><span>2</span>Grooming</li>
+      <li><span>3</span>Feeding</li>
+      <li><span>4</span>Quiescent</li>
+      <li><span>5</span>HaltereSwitch</li>
+    </ul>
+    <p>The repository currently contains the training code. Analysis scripts will be added as individual, self-contained scripts.</p>
+  </section>
+
+  <section>
+    <h2>Install</h2>
+    <p>FlyPE uses <a href="https://docs.astral.sh/uv/">uv</a>. Pick the PyTorch runtime that matches your machine.</p>
+<pre><code>git clone https://github.com/mfkeles/FlyPE.git
+cd FlyPE
+uv sync --extra cuda    # Windows/Linux with an NVIDIA GPU
+uv sync --extra metal   # macOS on Apple Silicon
+uv sync --extra cpu     # CPU only</code></pre>
+  </section>
+
+  <section>
+    <h2>Train</h2>
+<pre><code>uv run flype-train --data /path/to/data.yaml --project runs --device 0</code></pre>
+    <p>The run is written to <code>runs/flype/</code>, with the best checkpoint at <code>runs/flype/weights/best.pt</code>. Training expects a standard <a href="https://docs.ultralytics.com/datasets/detect/">Ultralytics detection dataset</a>; see the <a href="https://github.com/mfkeles/FlyPE#dataset">README</a> for the layout.</p>
+  </section>
+
+  <section>
+    <h2>Recipe</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Model</th><td>YOLO11-l, COCO-pretrained</td></tr>
+        <tr><th>Image size</th><td>800 px, rectangular batches</td></tr>
+        <tr><th>Schedule</th><td>200 epochs, early stopping with 100-epoch patience</td></tr>
+        <tr><th>Batch size</th><td>16</td></tr>
+        <tr><th>Seed</th><td>0</td></tr>
+        <tr><th>Colour augmentation</th><td>Brightness only; hue and saturation off, so the colour-coded motion channel is preserved</td></tr>
+        <tr><th>Geometric augmentation</th><td>Scale ±50%, translate ±10%, horizontal flip</td></tr>
+        <tr><th>Other augmentation</th><td>Random erasing, RandAugment</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <a href="https://github.com/mfkeles/FlyPE">github.com/mfkeles/FlyPE</a>
+  </footer>
+</main>
+</body>
+</html>
